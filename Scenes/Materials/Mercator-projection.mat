@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Mercator-projection
+  m_Shader: {fileID: 4800000, guid: 93c37886369db84489851e70614e99df, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _DetailNormalMap:
+        m_Texture: {fileID: 2800000, guid: 5c17bce723881bd489ae66b13f1e109a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailTex:
+        m_Texture: {fileID: 2800000, guid: af85077e88ba2e14c89afd50a972dc7d, type: 3}
+        m_Scale: {x: 100, y: 100}
+        m_Offset: {x: 0, y: 0}
+    - _HeatTex:
+        m_Texture: {fileID: 2800000, guid: f03e4744feb9d5a48b3ed6b9f611fe9a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 913fe0c185aa568419c288a903f78773, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 2a4fd3ab66c5be24ea0e0ad843251ed0, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _BumpScale: 1
+    - _DetailBumpScale: 0.7
+    - _Metallic: 0
+    - _Smoothness: 1
+    - _WaterMetallic: 0
+    - _WaterSmoothness: 1
+    m_Colors:
+    - _Emission: {r: 0.19446424, g: 0.20506145, b: 0.4339623, a: 1}
+    - _Tint: {r: 1, g: 1, b: 1, a: 1}
+    - _WaterTint: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
