@@ -16,21 +16,21 @@ float _BumpScale, _DetailBumpScale;
 
 float _Metallic,_WaterMetallic;
 float _Smoothness,_WaterSmoothness;
-float4 _Emission;
+float4 _Emission;				/// 自发光
 struct VertexData {
-	float4 position : POSITION;
-	float3 normal : NORMAL;
-	float4 tangent : TANGENT;
-	float2 uv : TEXCOORD0;
+	float4 position : POSITION;	/// 原始数据
+	float3 normal : NORMAL;		/// 法线
+	float4 tangent : TANGENT;	/// 切线空间法线	
+	float2 uv : TEXCOORD0;		/// 贴图位置
 };
 
 struct Interpolators {
-	float4 position : SV_POSITION;
-	float4 uv : TEXCOORD0;
-	float3 normal : TEXCOORD1;
-	float2 uvHeat: TEXCOORD7;
-	float3 originNormal : TEXCOORD8;
-	float3 worldNormal:TEXCOORD9;
+	float4 position : SV_POSITION;	/// 转换为屏幕坐标
+	float4 uv : TEXCOORD0;			/// 贴图位置
+	float3 normal : TEXCOORD1;		/// 根据法线贴图并且归一化的法线
+	float2 uvHeat: TEXCOORD7;		/// 热度贴图位置
+	float3 originNormal : TEXCOORD8;/// 保存的原始法线
+	float3 worldNormal:TEXCOORD9;	/// 不带法线贴图的法线
 	#if defined(BINORMAL_PER_FRAGMENT)
 		float4 tangent : TEXCOORD2;
 	#else
@@ -38,7 +38,7 @@ struct Interpolators {
 		float3 binormal : TEXCOORD3;
 	#endif
 
-	float3 worldPos : TEXCOORD4;
+	float3 worldPos : TEXCOORD4;	/// 转换为世界坐标
 
 	#if defined(VERTEXLIGHT_ON)
 		float3 vertexLightColor : TEXCOORD5;
@@ -85,7 +85,7 @@ Interpolators MyVertexProgram (VertexData v) {
 
 UnityLight CreateLight (Interpolators i) {
 	UnityLight light;
-
+	/// 不同类型光源的处理
 	#if defined(POINT) || defined(POINT_COOKIE) || defined(SPOT)
 		light.dir = normalize(_WorldSpaceLightPos0.xyz - i.worldPos);
 	#else
@@ -116,6 +116,7 @@ UnityIndirect CreateIndirectLight (Interpolators i) {
 
 void InitializeFragmentNormal(inout Interpolators i,bool isWater) {
 	float3 Normal ;
+	/// 水面和非水面使用不同法线贴图
 	if(isWater){
 		Normal=UnpackScaleNormal(tex2D(_DetailNormalMap, i.uv.zw+sin(_Time.x)), _DetailBumpScale);
 	}else{
@@ -129,7 +130,7 @@ void InitializeFragmentNormal(inout Interpolators i,bool isWater) {
 	#else
 		float3 binormal = i.binormal;
 	#endif
-	
+	/// 法线的转换
 	i.normal = normalize(
 		tangentSpaceNormal.x * i.tangent +
 		tangentSpaceNormal.y * binormal +
@@ -138,10 +139,11 @@ void InitializeFragmentNormal(inout Interpolators i,bool isWater) {
 }
 
 
-
+/// 根据当前使用的贴图，颜色很暗并且蓝大于红元素被认为是水面
 bool isWater(float3 col){
 	return (col.r+col.g+col.b<0.4 && col.b>col.r);
 }
+
 float4 MyFragmentProgram (Interpolators i) : SV_TARGET {
 	
 	
@@ -160,8 +162,6 @@ float4 MyFragmentProgram (Interpolators i) : SV_TARGET {
 	}else{
 	}
 	
-	
-	
 	float3 specularTint;
 	float oneMinusReflectivity;
 	albedo = DiffuseAndSpecularFromMetallic(
@@ -179,17 +179,21 @@ float4 MyFragmentProgram (Interpolators i) : SV_TARGET {
 	
 	if(!isWaters)
 	{
+		/// 设置夜晚的自发光现象
 		float normal_to_light = distance(i.worldNormal,Li.dir);
 		float3 col_heat = tex2D(_HeatTex, i.uvHeat.xy).rgb;
 		if(col_heat.g>0.6 )
 		{
+			/// 随着本身法线和光线方向的距离变大，发光权重变大。
+			/// 当然实际上这些光线很难看到。
 			float weight1 = FresnelLerp(0,1,(normal_to_light));
 			weight1 = clamp(0,1,weight1);
+			/// 以下操作根据多次测试调处较为优秀的表现。
 			float weight =  abs(i.originNormal.y)+abs(i.originNormal.x)+abs(i.originNormal.x);
 			weight*=weight1;
 			weight = abs(0.2-weight);
 			weight/=2;
-			
+			/// 自发光简单的在最后做相加
 			ret +=_Emission*weight;
 		}
 	}
